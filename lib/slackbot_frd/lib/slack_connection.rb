@@ -41,6 +41,9 @@ module SlackbotFrd
 
       # These hashes are used to map ids to names efficiently
       @user_id_to_name = {}
+      @user_id_to_displayname = {}
+      @user_id_to_realname = {}
+      @user_id_to_email = {}
       @user_name_to_id = {}
       @channel_id_to_name = {}
       @channel_name_to_id = {}
@@ -259,6 +262,18 @@ module SlackbotFrd
       @user_id_to_name.keys
     end
 
+    def user_displaynames(_force_refresh = false)
+      @user_id_to_displayname.keys
+    end
+
+    def user_realnames(_force_refresh = false)
+      @user_id_to_realname.keys
+    end
+
+    def user_emails(_force_refresh = false)
+      @user_id_to_email.keys
+    end
+
     def user_names(_force_refresh = false)
       @user_name_to_id.keys
     end
@@ -280,6 +295,39 @@ module SlackbotFrd
         SlackbotFrd::Log.warn("#{self.class}: User id '#{user_id}' not found")
       end
       @user_id_to_name[user_id]
+    end
+
+    def user_id_to_displayname(user_id)
+      return user_id if user_id == :any || user_id == :bot
+      unless @user_id_to_displayname && @user_id_to_displayname.key?(user_id)
+        refresh_user_info
+      end
+      unless @user_id_to_displayname.include?(user_id)
+        SlackbotFrd::Log.warn("#{self.class}: User id '#{user_id}' not found")
+      end
+      @user_id_to_displayname[user_id]
+    end
+
+    def user_id_to_realname(user_id)
+      return user_id if user_id == :any || user_id == :bot
+      unless @user_id_to_realname && @user_id_to_realname.key?(user_id)
+        refresh_user_info
+      end
+      unless @user_id_to_realname.include?(user_id)
+        SlackbotFrd::Log.warn("#{self.class}: User id '#{user_id}' not found")
+      end
+      @user_id_to_realname[user_id]
+    end
+
+    def user_id_to_email(user_id)
+      return user_id if user_id == :any || user_id == :bot
+      unless @user_id_to_email && @user_id_to_email.key?(user_id)
+        refresh_user_info
+      end
+      unless @user_id_to_email.include?(user_id)
+        SlackbotFrd::Log.warn("#{self.class}: User id '#{user_id}' not found")
+      end
+      @user_id_to_email[user_id]
     end
 
     def user_name_to_id(user_name)
@@ -539,6 +587,9 @@ module SlackbotFrd
       begin
         users_list = SlackbotFrd::SlackMethods::UsersList.new(@token).connect
         @user_id_to_name = users_list.ids_to_names
+        @user_id_to_displayname = users_list.ids_to_displaynames
+        @user_id_to_realname = users_list.ids_to_realnames
+        @user_id_to_email = users_list.ids_to_email
         @user_name_to_id = users_list.names_to_ids
       rescue SocketError => e
         log_and_add_to_error_file(socket_error_message(e))

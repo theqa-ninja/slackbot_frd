@@ -34,6 +34,30 @@ module SlackbotFrd
         end
         retval
       end
+
+      def ids_to_displaynames
+        retval = {}
+        @response['members'].each do |user|
+          retval[user['id']] = user['profile']['display_name_normalized']
+        end
+        retval
+      end
+
+      def ids_to_realnames
+        retval = {}
+        @response['members'].each do |user|
+          retval[user['id']] = user['profile']['real_name_normalized']
+        end
+        retval
+      end
+
+      def ids_to_email
+        retval = {}
+        @response['members'].each do |user|
+          retval[user['id']] = user['profile']['email']
+        end
+        retval
+      end
     end
   end
 end
